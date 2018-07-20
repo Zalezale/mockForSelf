@@ -1,0 +1,31 @@
+{
+  "name": "mockforself",
+  "version": "1.0.0",
+  "description": "make data for self to check pro",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zalezale/mockForSelf.git"
+  },
+  "author": "zale",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zalezale/mockForSelf/issues"
+  },
+  "homepage": "https://github.com/Zalezale/mockForSelf#readme",
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-react": "^7.10.0"
+  },
+  "dependencies": {
+    "koa-bodyparser": "^4.2.1",
+    "koa": "^2.5.2",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0"
+  }
+}
