@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	</head>
+
+	<body>
+		<button onclick="post()">post</button>
+		<button onclick="get()">get</button>
+		<script>
+			function post() {
+				let author = {
+					name: 'zale'
+				}
+				$.ajax({
+					type: "post",
+					data: JSON.stringify(author),
+					url: "http://127.0.0.1:3000/data1",
+					dataType: 'json',
+					contentType: "application/json",
+					async: true,
+				}).done(function(e) {
+					console.log(e)
+				});
+			}
+
+			function get() {
+				var ajax = new XMLHttpRequest();
+
+				// 2设置
+				ajax.open('get', 'http://127.0.0.1:3000/data2');
+
+				// 3.发送
+				ajax.send();
+
+				// 4.状态事件
+				ajax.onreadystatechange = function() {
+					if(ajax.readyState == 4 && ajax.status == 200) {
+						// 5.使用返回的数据 修改页面的内容
+						// responseText 返回的就是一个 字符串
+						// 我们 在ajax 中 如果 是通过 ajax.responseText 获取到的 统统都是字符串
+						console.log(ajax.responseText);
+					}
+				}
+			}
+		</script>
+	</body>
+
+</html>
