@@ -50,7 +50,7 @@ router.post('/:name',async (ctx,next)=>{
     ctx.body = content
 })
 /* eslint-enable */
-app.use(server(__dirname+'/source/',{extensions:['.json']}))//eslint-disable-line
+app.use(server('./source'))//eslint-disable-line
 app.use(bodyParser())
 app.use(cors({
     origin: function(ctx) {
