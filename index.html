@@ -10,6 +10,7 @@
 	<body>
 		<button onclick="post()">post</button>
 		<button onclick="get()">get</button>
+		<button onclick="head1()">head</button>
 		<script>
 			function post() {
 				let author = {
@@ -31,6 +32,15 @@
 				$.ajax({
 					type: "get",
 					url: "http://127.0.0.1:3000/?name=data2",
+					async: true,
+				}).done(function(e) {
+					console.log(e)
+				});
+			}
+			function head1() {
+				$.ajax({
+					type: "head",
+					url: "http://127.0.0.1:3000/kkk",
 					async: true,
 				}).done(function(e) {
 					console.log(e)
