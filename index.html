@@ -11,6 +11,7 @@
 		<button onclick="post()">post</button>
 		<button onclick="get()">get</button>
 		<button onclick="head1()">head</button>
+			<button onclick="put()">put</button>
 		<script>
 			function post() {
 				let author = {
@@ -37,10 +38,23 @@
 					console.log(e)
 				});
 			}
+
 			function head1() {
 				$.ajax({
 					type: "head",
 					url: "http://127.0.0.1:3000/kkk",
+					async: true,
+				}).done(function(e) {
+					console.log(e)
+				});
+			}
+				function put() {
+					let people = {name:'zale'}
+				$.ajax({
+					type: "put",
+					url: "http://127.0.0.1:3000/kkk",
+					data: JSON.stringify(people),
+					contentType: "application/json",
 					async: true,
 				}).done(function(e) {
 					console.log(e)
