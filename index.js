@@ -20,6 +20,18 @@ router.get('/', async (ctx, next) => {
     })
 
 })
+router.get('/', async (ctx, next) => {
+    //ctx.query    
+    await new Promise((resolve, reject) => {
+        fs.readFile(publicPath + ctx.query.name + '.json', 'utf8', (err, data) => {
+            if (err) throw err
+            resolve(data)
+        })
+    }).then((data) => {
+        ctx.body = data
+    })
+
+})
 //不能将get设置为动态路由，否则会跨域错误
 // router.get('/:name',async (ctx,next)=>{
 //     //ctx.request.body
@@ -43,6 +55,21 @@ router.post('/:name', async (ctx, next) => {
         })
     }).then((data) => {
         ctx.body = data
+    })
+
+})
+router.post('/img/:name', async (ctx, next) => {
+    await new Promise((resolve, reject) => {
+        fs.writeFile(publicPath + ctx.params.name + '.png', ctx.request.body, (err, data) => {
+            if (err) throw err
+            resolve(data)
+        })
+    }).then((data) => {
+        if(ctx.request.body.usr!=='zale'){
+            ctx.redirect('../err.html')
+        }else{
+            ctx.status = 204
+        }
     })
 
 })
@@ -75,14 +102,14 @@ router.head('/:name', async (ctx, next) => {
 router.put('/:name', async (ctx, next) => {
     await new Promise((resolve, reject) => {
         fs.writeFile(publicPath + ctx.params.name + '.txt', JSON.stringify(ctx.request.body), (err) => {
-            if (err){
+            if (err) {
                 reject(err)
-            } else{
+            } else {
                 resolve()
             }
         })
-    }).then(()=>{
-        ctx.set('Location', `${publicPath+ctx.params.name+'.txt'}`)
+    }).then(() => {
+        ctx.set('Location', `${publicPath + ctx.params.name + '.txt'}`)
         ctx.status = 201
     })
 })
