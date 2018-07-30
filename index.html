@@ -14,12 +14,10 @@
 	<button onclick="head1()">head</button>
 	<button onclick="put()">put</button>
 	<!-- form表单无法装载图片传到服务器端为空，如果为204则不会刷新-->
-	<form action="http://127.0.0.1:3000/img/first" method="POST">
-		<input type="text" name="usr" />
-		<input type="password" name="psw" />
-		<input type="submit" value="submit" />
-		<input type="button" value="上传" onclick="upload()">
-	</form>
+	<iframe src="./form.html">
+		
+	</iframe>
+	<input type="button" value="上传" onclick="upload()">
 	<script>
 		function post() {
 			let author = {
