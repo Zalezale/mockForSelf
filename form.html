@@ -9,9 +9,13 @@
 </head>
 
 <body>
+    <form action="http://127.0.0.1:3000/txt/first" method="POST" target="_self" enctype="multipart/form-data">
+        <input type="file" name="file1">
+        <input type="submit" value="上传txt" />
+    </form>
     <form action="http://127.0.0.1:3000/img/first" method="POST" target="_self" enctype="multipart/form-data">
-        <input type="file">
-        <input type="submit" value="submit" />
+        <input type="file" name="file1">
+        <input type="submit" value="上传图片" />
     </form>
 </body>
 

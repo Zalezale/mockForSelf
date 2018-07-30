@@ -58,20 +58,80 @@ router.post('/:name', async (ctx, next) => {
     })
 
 })
-router.post('/img/:name', async (ctx, next) => {
+//formdata txt
+router.post('/txt/:name', async (ctx, next) => {
     await new Promise((resolve, reject) => {
-        fs.writeFile(publicPath + ctx.params.name + '.png', ctx.request.body, (err, data) => {
-            if (err) throw err
-            resolve(data)
+        let chunks = []
+        ctx.req.on('data', (chunk) => {
+           chunks.push(chunk)
+        })
+        ctx.req.on('end', () => {
+            let data = Buffer.concat(chunks)  
+             resolve(data.toString('utf8').split('\r\n')[4])        
         })
     }).then((data) => {
-        if(ctx.request.body.usr!=='zale'){
+        return new Promise((resolve, reject) => {
+            var writerStream = fs.createWriteStream(publicPath+'test.txt');
+            // 使用 utf8 编码写入数据
+            writerStream.write(data, 'UTF8');
+            // 标记文件末尾
+            writerStream.end();
+            // 处理流事件 --> data, end, and error
+            writerStream.on('finish', function () {
+                resolve()
+            });
+            writerStream.on('error', function (err) {
+                console.log(err.stack);
+            });
+        })
+    }).then(() => {
+        if (ctx.request.body.usr == 'zale') {
             ctx.redirect('../err.html')
-        }else{
-            ctx.status = 204
+        } else {
+            ctx.status = 200
         }
     })
-
+})
+//formdata img
+router.post('/img/:name', async (ctx, next) => {
+    await new Promise((resolve, reject) => {
+        let chunks = []
+        ctx.req.on('data', (chunk) => {
+           chunks.push(chunk)
+        })
+        ctx.req.on('end', () => {
+            let data = Buffer.concat(chunks) 
+            let arry = data.toString('binary').split('\r\n')   
+            arry.shift()
+            arry.shift()
+            arry.shift()
+            arry.shift()
+            arry.pop() 
+            arry.pop() 
+            resolve(Buffer.from(arry.join('\r\n'),'binary'))   
+        })
+    }).then((data) => {
+        return new Promise((resolve, reject) => {
+            var writerStream = fs.createWriteStream(publicPath+'test.png');
+            // 使用 utf8 编码写入数据
+            writerStream.write(data, 'binary');
+            // 标记文件末尾
+            writerStream.end();
+            // 处理流事件 --> data, end, and error
+            writerStream.on('finish', function () {
+                resolve()
+            });
+            writerStream.on('error', function (err) {
+                console.log(err.stack);
+            });
+        })
+    }).then(() => {
+        if (ctx.request.body.usr == 'zale') {
+            ctx.redirect('../err.html')
+        } else {
+            ctx.status = 200
+        }
+    })
 })
 /**
  * 1.检查资源的有效性。 
