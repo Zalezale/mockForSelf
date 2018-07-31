@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+			<form  enctype="multipart/form-data">
+				<input type="file" iname="file"  id="file" onchange="test()"/>				
+				<button id="btn">上传</button>
+			</form>
+			<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+			<script>
+				var input = document.getElementById("file");				
+				var formData = new FormData();			
+				var btn = document.getElementById("btn");
+				btn.addEventListener("click",function(){
+					$.ajax({
+					data:formData,
+					type:"post",
+					url:"http://127.0.0.1:3000/txt/first",
+					async:true,
+					processData: false, 
+						contentType: false, 					
+						success : function(){
+							alert("传输成功");
+						},
+						error : function(){
+							
+						}
+					});
+				})
+				function test(){
+					formData.append('one',input.files[0])
+				}
+				
+			</script>
+	</body>
+</html>
