@@ -6,17 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./public.js"></script>
 </head>
 
 <body>
-    <form action="http://127.0.0.1:3000/txt/first" method="POST" target="_self" enctype="multipart/form-data">
+    <form method="POST" target="_self" enctype="multipart/form-data">
         <input type="file" name="file1">
         <input type="submit" value="上传txt" />
     </form>
-    <form action="http://127.0.0.1:3000/img/first" method="POST" target="_self" enctype="multipart/form-data">
+    <form method="POST" target="_self" enctype="multipart/form-data">
         <input type="file" name="file1">
         <input type="submit" value="上传图片" />
     </form>
+    <script>
+        document.forms[0].setAttribute('action', localIp + 'json/first')
+        document.forms[1].setAttribute('action', localIp + 'img/first')
+    </script>
 </body>
 
 </html>

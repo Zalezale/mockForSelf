@@ -6,71 +6,64 @@
 	<title></title>
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 	 crossorigin="anonymous"></script>
+	 <script src="./public.js"></script>
 </head>
 
 <body>
-	<button onclick="post()">post</button>
-	<button onclick="get()">get</button>
-	<button onclick="head1()">head</button>
-	<button onclick="put()">put</button>
+	<button onclick="postMth()">post</button>
+	<button onclick="getMth()">get</button>
+	<button onclick="headMth()">head</button>
+	<button onclick="putMth()">put</button>
 	<!-- form表单无法装载图片传到服务器端为空，如果为204则不会刷新-->
 	<iframe src="./form.html">
 		
 	</iframe>
 	<script>
-		function post() {
+		const webUrl = localIp || "http://10.123.0.130:3000/"
+		function postMth() {
 			let author = {
 				name: 'zale'
 			}
 			$.ajax({
 				type: "post",
 				data: JSON.stringify(author),
-				url: "http://127.0.0.1:3000/data1",
+				url: webUrl+"first",
 				dataType: 'json',
-				contentType: "application/json",
+				contentType: "application/json/",
 				async: true,
 			}).done(function (e) {
-				console.log(e)
+				alert(e)
 			});
 		}
-
-		function get() {
+		function getMth() {
 			$.ajax({
 				type: "get",
-				url: "http://127.0.0.1:3000/?name=data2",
+				url: webUrl+"source?name=first",
 				async: true,
 			}).done(function (e) {
-				console.log(e)
+				alert(e)
 			});
 		}
-
-		function head1() {
+		function headMth() {
 			$.ajax({
 				type: "head",
-				url: "http://127.0.0.1:3000/kkk",
+				url: webUrl+"first",
 				async: true,
 			}).done(function (e) {
-				console.log(e)
+				alert(e)
 			});
 		}
-		function put() {
+		function putMth() {
 			let people = { name: 'zale' }
 			$.ajax({
 				type: "put",
-				url: "http://127.0.0.1:3000/kkk",
+				url: webUrl+"first",
 				data: JSON.stringify(people),
 				contentType: "application/json",
 				async: true,
 			}).done(function (e) {
-				console.log(e)
+				alert(e)
 			});
-		}
-		window.onload = () => {
-
-		}
-		function upload() {
-			let formobj = window.form[0]
-			let formdata = formobj.getFormData()
 		}
 	</script>
 </body>

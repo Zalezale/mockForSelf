@@ -5,10 +5,10 @@
 		<title></title>
 	</head>
 	<body>
-			<form  enctype="multipart/form-data">
+			
 				<input type="file" iname="file"  id="file" onchange="test()"/>				
 				<button id="btn">上传</button>
-			</form>
+		
 			<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 			<script>
 				var input = document.getElementById("file");				
@@ -18,7 +18,7 @@
 					$.ajax({
 					data:formData,
 					type:"post",
-					url:"http://127.0.0.1:3000/txt/first",
+					url:"http://10.123.0.130:3000/img/first",
 					async:true,
 					processData: false, 
 						contentType: false, 					
