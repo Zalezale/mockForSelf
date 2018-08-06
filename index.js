@@ -1,4 +1,3 @@
-
 const koa = require('koa')
 const server = require('koa-static')
 const router = require('koa-router')()
@@ -7,7 +6,6 @@ const os = require('os')
 const bodyParse = require('koa-bodyparser')
 const publicPath = './source/'
 const app = new koa()
-
 /* eslint-disable */
 //往public文件中配置当前的ip地址
 fs.writeFile("./public.js", "const localIp = 'http://" + os.networkInterfaces().en0[1].address + ":3000/'//eslint-disable-line", function (err) {
@@ -37,24 +35,24 @@ router.get('/source', async (ctx, next) => {
         ctx.body = data
     })
 })
-//获取资源
+//获取资源 加验证
 router.post('/:name', async (ctx,
      next) => {
-    console.log(ctx.request.body)
-    await new Promise((resolve, reject) => {
-        fs.readFile(publicPath + ctx.params.name + '.json', 'utf8', (err, data) => {
-            if (err) throw err
-            resolve(data)
+        await new Promise((resolve, reject) => {
+            let data = ''
+            ctx.req.on('data', (chunk) => {
+                data += chunk
+            })
+            ctx.req.on('end', () => {
+               resolve(data)          
+            })
+        }).then((data) => {
+            if (JSON.parse(data).name !== 'zale') {
+                ctx.redirect('./err.html')
+            } else {
+                ctx.body = data
+            }
         })
-    }).then((data) => {
-        console.log(ctx.req)
-        if (ctx.request.body.name == 'zale') {
-            ctx.redirect('./err.html')
-        } else {
-            ctx.body = data
-        }
-    })
-
 })
 //上传文件（json）
 router.post('/json/:name', async (ctx, next) => {
