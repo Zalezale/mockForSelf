@@ -63,13 +63,13 @@ router.post('/json/:name', async (ctx, next) => {
         })
         ctx.req.on('end', () => {
             let data = Buffer.concat(chunks)
-            resolve(data.toString('utf8').split('\r\n')[4])
+            resolve(data)
         })
     }).then((data) => {
         return new Promise((resolve, reject) => {
-            var writerStream = fs.createWriteStream(publicPath + ctx.params.name + '.json');
+            var writerStream = fs.createWriteStream(publicPath + data.toString('utf8').split('\r\n')[1].split('"')[3]);
             // 使用 utf8 编码写入数据
-            writerStream.write(data, 'UTF8');
+            writerStream.write(data.toString('utf8').split('\r\n')[4], 'UTF8');
             // 标记文件末尾
             writerStream.end();
             // 处理流事件 --> data, end, and error
@@ -88,6 +88,7 @@ router.post('/json/:name', async (ctx, next) => {
 })
 //上传文件（图片）
 router.post('/img/:name', async (ctx, next) => {
+    let picName = ''
     await new Promise((resolve, reject) => {
         let chunks = []
         ctx.req.on('data', (chunk) => {
@@ -98,8 +99,8 @@ router.post('/img/:name', async (ctx, next) => {
             let arry = data.toString('binary').split('\r\n')
             //arry.shift() //手机上的upload上传时添加这个
             arry.shift()
-            arry.shift()
-            arry.shift()
+            picName = arry.shift()
+             arry.shift()
             arry.shift()
             arry.pop()
             arry.pop()
@@ -107,7 +108,7 @@ router.post('/img/:name', async (ctx, next) => {
         })
     }).then((data) => {
         return new Promise((resolve, reject) => {
-            var writerStream = fs.createWriteStream(publicPath + ctx.params.name + '.png');
+            var writerStream = fs.createWriteStream(publicPath + picName.split('"')[3]);
             // 使用 utf8 编码写入数据
             writerStream.write(data, 'binary');
             // 标记文件末尾
