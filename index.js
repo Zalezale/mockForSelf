@@ -3,7 +3,7 @@ const server = require('koa-static')
 const router = require('koa-router')()
 const fs = require('fs')
 const os = require('os')
-const bodyParse = require('koa-bodyparser')
+//const bodyParse = require('koa-bodyparser')  //这个中间件不能与ctx.on同在
 const publicPath = './source/'
 const app = new koa()
 /* eslint-disable */
@@ -15,8 +15,10 @@ fs.writeFile("./public.js", "const localIp = 'http://" + os.networkInterfaces().
 router.get('/', async (ctx, next) => {
     await new Promise((resolve, reject) => {
         fs.readFile('./index.html', 'utf8', (err, data) => {
-            if (err) throw err
-            resolve(data)
+            if (err){
+                ctx.status = 500
+            }else{
+            resolve(data)}
         })
     }).then((data) => {
         ctx.body = data
@@ -28,31 +30,44 @@ router.get('/', async (ctx, next) => {
 router.get('/source', async (ctx, next) => {
     await new Promise((resolve, reject) => {
         fs.readFile(publicPath + ctx.query.name + '.json', 'utf8', (err, data) => {
-            if (err) throw err
-            resolve(data)
+            if (err){
+                reject(err)
+            }else{
+            resolve(data)}
         })
     }).then((data) => {
         ctx.body = data
+    }).catch((err)=>{
+        ctx.status = 500
+        ctx.body = "没有相关的api"
     })
 })
 //获取资源 加验证
-router.post('/:name', async (ctx,
-     next) => {
-        await new Promise((resolve, reject) => {
-            let data = ''
-            ctx.req.on('data', (chunk) => {
-                data += chunk
-            })
-            ctx.req.on('end', () => {
-               resolve(data)          
-            })
-        }).then((data) => {
-            if (JSON.parse(data).name !== 'zale') {
+router.post('/:name', async (ctx,next) => {
+    await new Promise((resolve, reject) => {
+
+        let data = ''
+        ctx.req.on('data', (chunk) => {
+            data += chunk
+        })
+        ctx.req.on('end', () => {
+            resolve(data)
+        })
+    }).then((data) => {
+        return new Promise((resolve,reject)=>{
+            if (JSON.parse(data).name !== 'zale') {          
                 ctx.redirect('./err.html')
-            } else {
-                ctx.body = data
+            } else {  
+                fs.readFile(publicPath + ctx.params.name + '.json', function (err, data) {         
+                    resolve(data)            
+                })
             }
         })
+    }).then((data)=>{
+        ctx.body = data
+    }).catch((err)=>{
+console.log(err)
+    })
 })
 //上传文件（json）
 router.post('/json/:name', async (ctx, next) => {
@@ -82,7 +97,7 @@ router.post('/json/:name', async (ctx, next) => {
         })
     }).then(() => {
         ctx.status = 200
-    }).catch(()=>{
+    }).catch(() => {
         ctx.redirect('./err.html')
     })
 })
@@ -100,7 +115,7 @@ router.post('/img/:name', async (ctx, next) => {
             //arry.shift() //手机上的upload上传时添加这个
             arry.shift()
             picName = arry.shift()
-             arry.shift()
+            arry.shift()
             arry.shift()
             arry.pop()
             arry.pop()
@@ -122,8 +137,8 @@ router.post('/img/:name', async (ctx, next) => {
             });
         })
     }).then(() => {
-            ctx.status = 200
-    }).catch((err)=>{
+        ctx.status = 200
+    }).catch((err) => {
         ctx.redirect('./err.html')
     })
 })
@@ -177,7 +192,7 @@ app.use(async (ctx, next) => {
     ctx.set('Access-Control-Expose-Headers', 'WWW-Authenticate,Server-Authorization')
     await next()
 })
-app.use(bodyParse())
+//app.use(bodyParse())
 app.use(router.routes())
 app.use(router.allowedMethods())//主要是针对options方法进行处理
 app.listen(3000)
