@@ -11,16 +11,16 @@
 
 <body>
     <form method="POST" target="_self" enctype="multipart/form-data">
-        <input type="file" name="file1">
+        <input type="file" name="file1" >
         <input type="submit" value="上传txt" />
     </form>
     <form method="POST" target="_self" enctype="multipart/form-data">
-        <input type="file" name="file1">
+        <input type="file" name="file1" multiple="multiple">
         <input type="submit" value="上传图片" />
     </form>
     <script>
-        document.forms[0].setAttribute('action', localIp + 'json/first')
-        document.forms[1].setAttribute('action', localIp + 'img/first')
+        document.forms[0].setAttribute('action', localIp + 'json')
+        document.forms[1].setAttribute('action', localIp + 'img')
     </script>
 </body>
 

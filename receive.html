@@ -6,7 +6,7 @@
 	</head>
 	<body>
 			
-				<input type="file" iname="file"  id="file" onchange="test()"/>				
+				<input type="file" iname="file"  id="file" onchange="test()" multiple="multiple"/>				
 				<button id="btn">上传</button>
 		
 			<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -18,7 +18,7 @@
 					$.ajax({
 					data:formData,
 					type:"post",
-					url:"http://10.123.0.130:3000/img/first",
+					url:"http://10.123.0.130:3000/img/lll",
 					async:true,
 					processData: false, 
 						contentType: false, 					
@@ -31,7 +31,7 @@
 					});
 				})
 				function test(){
-					formData.append('one',input.files[0])
+					formData.append('one',input.files[input.files.length-1])
 				}
 				
 			</script>

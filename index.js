@@ -26,16 +26,19 @@ router.get('/', async (ctx, next) => {
 
 })
 //不能将get设置为动态路由，否则会跨域错误
-//获取资源
+//获取图片资源
 router.get('/source', async (ctx, next) => {
     await new Promise((resolve, reject) => {
-        fs.readFile(publicPath + ctx.query.name + '.json', 'utf8', (err, data) => {
+        //这里如果设置编码utf8或者binary客户端下载之后无法打开
+        fs.readFile(publicPath + ctx.query.name,(err, data) => {
             if (err){
                 reject(err)
             }else{
             resolve(data)}
         })
     }).then((data) => {
+        ctx.type = 'image/png'
+        ctx.attachment('sign.png')
         ctx.body = data
     }).catch((err)=>{
         ctx.status = 500
@@ -124,7 +127,6 @@ router.post('/img/:name', async (ctx, next) => {
     }).then((data) => {
         return new Promise((resolve, reject) => {
             var writerStream = fs.createWriteStream(publicPath + picName.split('"')[3]);
-            // 使用 utf8 编码写入数据
             writerStream.write(data, 'binary');
             // 标记文件末尾
             writerStream.end();
