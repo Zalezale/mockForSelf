@@ -72,22 +72,22 @@ router.post('/:name', async (ctx,next) => {
 console.log(err)
     })
 })
-//上传文件（json）
+//上传文件（json）  上传图片（base64）
 router.post('/json/:name', async (ctx, next) => {
     await new Promise((resolve, reject) => {
-        let chunks = []
+        let chunks = [] //let imgData = ''
         ctx.req.on('data', (chunk) => {
-            chunks.push(chunk)
+            chunks.push(chunk) //imgData += chunk
         })
         ctx.req.on('end', () => {
-            let data = Buffer.concat(chunks)
-            resolve(data)
+            let data = Buffer.concat(chunks)  //resolve(imgData)
+            resolve(data)  
         })
     }).then((data) => {
         return new Promise((resolve, reject) => {
             var writerStream = fs.createWriteStream(publicPath + data.toString('utf8').split('\r\n')[1].split('"')[3]);
             // 使用 utf8 编码写入数据
-            writerStream.write(data.toString('utf8').split('\r\n')[4], 'UTF8');
+            writerStream.write(data.toString('utf8').split('\r\n')[4], 'UTF8');//writerStream.write(data,'base64');   data要去除逗号以及之前的部分
             // 标记文件末尾
             writerStream.end();
             // 处理流事件 --> data, end, and error
@@ -198,6 +198,7 @@ app.use(async (ctx, next) => {
 app.use(router.routes())
 app.use(router.allowedMethods())//主要是针对options方法进行处理
 app.listen(3000)
+
 
 
 
