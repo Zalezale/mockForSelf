@@ -10,6 +10,7 @@
 				<button id="btn">上传</button>
 		
 			<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+			<script type="text/javascript" src="public.js" ></script>
 			<script>
 				var input = document.getElementById("file");				
 				var formData = new FormData();			
@@ -18,7 +19,7 @@
 					$.ajax({
 					data:formData,
 					type:"post",
-					url:"http://10.123.0.130:3000/img/lll",
+					url:localIp+"upload/kkkk",
 					async:true,
 					processData: false, 
 						contentType: false, 					
@@ -32,6 +33,7 @@
 				})
 				function test(){
 					formData.append('one',input.files[input.files.length-1])
+					formData.append('two',input.files[input.files.length])
 				}
 				
 			</script>

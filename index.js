@@ -3,6 +3,7 @@ const server = require('koa-static')
 const router = require('koa-router')()
 const fs = require('fs')
 const os = require('os')
+const koaBody = require('koa-body')
 //const bodyParse = require('koa-bodyparser')  //这个中间件不能与ctx.on同在
 const publicPath = './source/'
 const app = new koa()
@@ -15,10 +16,11 @@ fs.writeFile("./public.js", "const localIp = 'http://" + os.networkInterfaces().
 router.get('/', async (ctx, next) => {
     await new Promise((resolve, reject) => {
         fs.readFile('./index.html', 'utf8', (err, data) => {
-            if (err){
+            if (err) {
                 ctx.status = 500
-            }else{
-            resolve(data)}
+            } else {
+                resolve(data)
+            }
         })
     }).then((data) => {
         ctx.body = data
@@ -30,23 +32,24 @@ router.get('/', async (ctx, next) => {
 router.get('/source', async (ctx, next) => {
     await new Promise((resolve, reject) => {
         //这里如果设置编码utf8或者binary客户端下载之后无法打开
-        fs.readFile(publicPath + ctx.query.name,(err, data) => {
-            if (err){
+        fs.readFile(publicPath + ctx.query.name, (err, data) => {
+            if (err) {
                 reject(err)
-            }else{
-            resolve(data)}
+            } else {
+                resolve(data)
+            }
         })
     }).then((data) => {
         ctx.type = 'image/png'
         ctx.attachment('sign.png')
         ctx.body = data
-    }).catch((err)=>{
+    }).catch((err) => {
         ctx.status = 500
         ctx.body = "没有相关的api"
     })
 })
 //获取资源 加验证
-router.post('/:name', async (ctx,next) => {
+router.post('/:name', async (ctx, next) => {
     await new Promise((resolve, reject) => {
 
         let data = ''
@@ -57,19 +60,19 @@ router.post('/:name', async (ctx,next) => {
             resolve(data)
         })
     }).then((data) => {
-        return new Promise((resolve,reject)=>{
-            if (JSON.parse(data).name !== 'zale') {          
+        return new Promise((resolve, reject) => {
+            if (JSON.parse(data).name !== 'zale') {
                 ctx.redirect('./err.html')
-            } else {  
-                fs.readFile(publicPath + ctx.params.name + '.json', function (err, data) {         
-                    resolve(data)            
+            } else {
+                fs.readFile(publicPath + ctx.params.name + '.json', function (err, data) {
+                    resolve(data)
                 })
             }
         })
-    }).then((data)=>{
+    }).then((data) => {
         ctx.body = data
-    }).catch((err)=>{
-console.log(err)
+    }).catch((err) => {
+        console.log(err)
     })
 })
 //上传文件（json）  上传图片（base64）
@@ -81,7 +84,7 @@ router.post('/json/:name', async (ctx, next) => {
         })
         ctx.req.on('end', () => {
             let data = Buffer.concat(chunks)  //resolve(imgData)
-            resolve(data)  
+            resolve(data)
         })
     }).then((data) => {
         return new Promise((resolve, reject) => {
@@ -144,6 +147,20 @@ router.post('/img/:name', async (ctx, next) => {
         ctx.redirect('./err.html')
     })
 })
+//基于组件来上传文件
+router.post('/upload/:name', async (ctx) => {
+    let files = ctx.request.files.one
+    function createFile(fileData) {
+        const reader = fs.createReadStream(fileData.path); // 创建可读流
+        const ext = fileData.name.split('.').pop(); // 获取上传文件扩展名
+        const upStream = fs.createWriteStream(`source/${Math.random().toString()}.${ext}`); // 创建可写流
+        reader.pipe(upStream)
+    }
+    for (let i = 0; i < files.length; i++) {
+        await createFile(files[i])
+    }
+    ctx.body = 'ok'
+})
 /**
  * 1.检查资源的有效性。 
  * 2.检查超链接的有效性。 
@@ -195,6 +212,12 @@ app.use(async (ctx, next) => {
     await next()
 })
 //app.use(bodyParse())
+app.use(koaBody({
+    multipart: true,
+    formidable: {
+        maxFileSize: 200 * 1024 * 1024 // 设置上传文件大小最大限制，默认2M
+    }
+}))
 app.use(router.routes())
 app.use(router.allowedMethods())//主要是针对options方法进行处理
 app.listen(3000)
