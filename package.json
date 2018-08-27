@@ -4,7 +4,7 @@
   "description": "make data for self to check pro",
   "main": "index.html",
   "scripts": {
-    "test": "node index.js"
+    "serve": "node index.js"
   },
   "repository": {
     "type": "git",

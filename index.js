@@ -4,7 +4,6 @@ const router = require('koa-router')()
 const fs = require('fs')
 const os = require('os')
 const koaBody = require('koa-body')
-//const bodyParse = require('koa-bodyparser')  //这个中间件不能与ctx.on同在
 const publicPath = './source/'
 const app = new koa()
 /* eslint-disable */
@@ -12,154 +11,36 @@ const app = new koa()
 fs.writeFile("./public.js", "const localIp = 'http://" + os.networkInterfaces().en0[1].address + ":3000/'//eslint-disable-line", function (err) {
     if (err) throw new Error('写入ip时出错')
 })
-//获取操作界面
-router.get('/', async (ctx, next) => {
-    await new Promise((resolve, reject) => {
-        fs.readFile('./index.html', 'utf8', (err, data) => {
-            if (err) {
-                ctx.status = 500
-            } else {
-                resolve(data)
-            }
-        })
-    }).then((data) => {
-        ctx.body = data
-    })
 
-})
-//不能将get设置为动态路由，否则会跨域错误
-//获取图片资源
-router.get('/source', async (ctx, next) => {
+//基于组件获取响应数据
+router.post('/:webserviceName/:apiName', async (ctx) => {
+    let api = ctx.params.apiName
     await new Promise((resolve, reject) => {
-        //这里如果设置编码utf8或者binary客户端下载之后无法打开
-        fs.readFile(publicPath + ctx.query.name, (err, data) => {
+        fs.readFile(`${publicPath + api}.json`, 'utf8',function (err, data) {
             if (err) {
                 reject(err)
             } else {
                 resolve(data)
             }
         })
-    }).then((data) => {
-        ctx.type = 'image/png'
-        ctx.attachment('sign.png')
-        ctx.body = data
-    }).catch((err) => {
+    }).then((data)=>{
+        ctx.body= data
+    }).catch((err)=>{
         ctx.status = 500
-        ctx.body = "没有相关的api"
+        ctx.body = err
     })
 })
-//获取资源 加验证
-router.post('/:name', async (ctx, next) => {
-    await new Promise((resolve, reject) => {
-
-        let data = ''
-        ctx.req.on('data', (chunk) => {
-            data += chunk
-        })
-        ctx.req.on('end', () => {
-            resolve(data)
-        })
-    }).then((data) => {
-        return new Promise((resolve, reject) => {
-            if (JSON.parse(data).name !== 'zale') {
-                ctx.redirect('./err.html')
-            } else {
-                fs.readFile(publicPath + ctx.params.name + '.json', function (err, data) {
-                    resolve(data)
-                })
-            }
-        })
-    }).then((data) => {
-        ctx.body = data
-    }).catch((err) => {
-        console.log(err)
-    })
-})
-//上传文件（json）  上传图片（base64）
-router.post('/json/:name', async (ctx, next) => {
-    await new Promise((resolve, reject) => {
-        let chunks = [] //let imgData = ''
-        ctx.req.on('data', (chunk) => {
-            chunks.push(chunk) //imgData += chunk
-        })
-        ctx.req.on('end', () => {
-            let data = Buffer.concat(chunks)  //resolve(imgData)
-            resolve(data)
-        })
-    }).then((data) => {
-        return new Promise((resolve, reject) => {
-            var writerStream = fs.createWriteStream(publicPath + data.toString('utf8').split('\r\n')[1].split('"')[3]);
-            // 使用 utf8 编码写入数据
-            writerStream.write(data.toString('utf8').split('\r\n')[4], 'UTF8');//writerStream.write(data,'base64');   data要去除逗号以及之前的部分
-            // 标记文件末尾
-            writerStream.end();
-            // 处理流事件 --> data, end, and error
-            writerStream.on('finish', function () {
-                resolve()
-            });
-            writerStream.on('error', function (err) {
-                reject(err)
-            });
-        })
-    }).then(() => {
-        ctx.status = 200
-    }).catch(() => {
-        ctx.redirect('./err.html')
-    })
-})
-//上传文件（图片）
-router.post('/img/:name', async (ctx, next) => {
-    let picName = ''
-    await new Promise((resolve, reject) => {
-        let chunks = []
-        ctx.req.on('data', (chunk) => {
-            chunks.push(chunk)
-        })
-        ctx.req.on('end', () => {
-            let data = Buffer.concat(chunks)
-            let arry = data.toString('binary').split('\r\n')
-            //arry.shift() //手机上的upload上传时添加这个
-            arry.shift()
-            picName = arry.shift()
-            arry.shift()
-            arry.shift()
-            arry.pop()
-            arry.pop()
-            resolve(Buffer.from(arry.join('\r\n'), 'binary'))
-        })
-    }).then((data) => {
-        return new Promise((resolve, reject) => {
-            var writerStream = fs.createWriteStream(publicPath + picName.split('"')[3]);
-            writerStream.write(data, 'binary');
-            // 标记文件末尾
-            writerStream.end();
-            // 处理流事件 --> data, end, and error
-            writerStream.on('finish', function () {
-                resolve()
-            });
-            writerStream.on('error', function (err) {
-                reject(err)
-            });
-        })
-    }).then(() => {
-        ctx.status = 200
-    }).catch((err) => {
-        ctx.redirect('./err.html')
-    })
-})
-//基于组件来上传文件
-router.post('/upload/:name', async (ctx) => {
-    let files = ctx.request.files.one
+//基于组件来上传响应数据
+router.post('/', async (ctx) => {
+    let file = ctx.request.files.file
     function createFile(fileData) {
         const reader = fs.createReadStream(fileData.path); // 创建可读流
         const ext = fileData.name.split('.').pop(); // 获取上传文件扩展名
-        const upStream = fs.createWriteStream(`source/${Math.random().toString()}.${ext}`); // 创建可写流
+        const upStream = fs.createWriteStream(`source/${file.name}`); // 创建可写流
         reader.pipe(upStream)
     }
-    for (let i = 0; i < files.length; i++) {
-        await createFile(files[i])
-    }
-    ctx.body = 'ok'
+    await createFile(file)
+    ctx.body = '文件上传成功'
 })
 /**
  * 1.检查资源的有效性。 
@@ -211,7 +92,6 @@ app.use(async (ctx, next) => {
     ctx.set('Access-Control-Expose-Headers', 'WWW-Authenticate,Server-Authorization')
     await next()
 })
-//app.use(bodyParse())
 app.use(koaBody({
     multipart: true,
     formidable: {
