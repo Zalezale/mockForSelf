@@ -4,6 +4,8 @@ const router = require('koa-router')()
 const fs = require('fs')
 const os = require('os')
 const koaBody = require('koa-body')
+const compress = require('koa-compress')
+const options = {threshold:20}
 const publicPath = './source/'
 const app = new koa()
 /* eslint-disable */
@@ -98,6 +100,7 @@ app.use(koaBody({
         maxFileSize: 200 * 1024 * 1024 // 设置上传文件大小最大限制，默认2M
     }
 }))
+app.use(compress(options))
 app.use(router.routes())
 app.use(router.allowedMethods())//主要是针对options方法进行处理
 app.listen(3000)
